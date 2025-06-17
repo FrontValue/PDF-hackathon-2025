@@ -1,5 +1,6 @@
 import cv2
 import torch
+import datetime
 
 # Load YOLOv5 model (make sure yolov5 is cloned locally and hubconf.py exists)
 model = torch.hub.load('yolov5', 'yolov5n', source='local')
@@ -23,9 +24,15 @@ while frame_count < 5:  # Just process 5 frames for testing
     print(f"\n[Frame {frame_count}]")
     print(results.pandas().xyxy[0][['name', 'confidence', 'xmin', 'ymin', 'xmax', 'ymax']])
 
-    # # Save annotated frame
+    # # # Save annotated frame
     # annotated_frame = results.render()[0]
     # cv2.imwrite(f"output_frame_{frame_count}.jpg", annotated_frame)
+
+    # Generate a timestamp string like: 2025-06-17_15-30-45
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+    annotated_frame = results.render()[0]
+    cv2.imwrite(f"{timestamp}_output_frame_{frame_count}.jpg", annotated_frame)
 
     frame_count += 1
 
