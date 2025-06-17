@@ -32,7 +32,7 @@ while frame_count < 5:  # Just process 5 frames for testing
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
     annotated_frame = results.render()[0]
-    cv2.imwrite(f"{timestamp}_output_frame_{frame_count}.jpg", annotated_frame)
+    cv2.imwrite(f"images/{timestamp}_output_frame_{frame_count}.jpg", annotated_frame)
 
     frame_count += 1
 
