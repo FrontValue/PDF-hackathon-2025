@@ -6,3 +6,6 @@ opencv-python
 pandas
 requests
 requests
+
+Flask
+websockets
