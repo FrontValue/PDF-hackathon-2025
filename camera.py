@@ -4,6 +4,7 @@ import time
 import logging
 import os
 from logging.handlers import RotatingFileHandler
+import numpy as np
 
 # Create logs directory if it doesn't exist
 os.makedirs('logs', exist_ok=True)
@@ -94,13 +95,16 @@ class Camera:
 			self.camera.release()
 
 	def get_frame(self, _bytes=True):
-		if len(self.frames)>0:
+		if len(self.frames) > 0:
 			if _bytes:
-				img = cv2.imencode('.png',self.frames[-1])[1].tobytes()
+				img = cv2.imencode('.png', self.frames[-1])[1].tobytes()
 			else:
 				img = self.frames[-1]
 		else:
-			with open("not-found.jpeg","rb") as f:
-				img = f.read()
+			logger.warning("No frames available in buffer")
+			if _bytes:
+				img = None
+			else:
+				img = np.zeros((480, 640, 3), dtype=np.uint8)  # Return a black frame
 		return img
 		

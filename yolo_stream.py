@@ -4,8 +4,12 @@ import threading
 import time
 from datetime import datetime
 import numpy as np
+import logging
 
 from camera import Camera
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 class YoloStreamer:
     def __init__(self, on_detections=None):
@@ -20,9 +24,14 @@ class YoloStreamer:
     def _run(self):
         while self.running:
             frame = self.cap.get_frame(_bytes=False)
-            if frame is None or not isinstance(frame, np.ndarray):
-                print("[YOLO] ❌ Invalid frame format.")
+            if frame is None:
+                logger.warning("No frame available from camera")
                 time.sleep(0.1)  # Add small delay to prevent CPU spinning
+                continue
+
+            if not isinstance(frame, np.ndarray):
+                logger.error(f"Invalid frame type: {type(frame)}")
+                time.sleep(0.1)
                 continue
 
             try:
@@ -34,29 +43,29 @@ class YoloStreamer:
 
                 timestamp = datetime.now().strftime('%H:%M:%S')
                 if not df.empty:
-                    print(f"[{timestamp}] Detections:\n{df}")
+                    logger.info(f"[{timestamp}] Detections:\n{df}")
                 else:
-                    print(f"[{timestamp}] No detections.")
+                    logger.info(f"[{timestamp}] No detections.")
 
                 # 🔁 Send results to callback if defined
                 if self.on_detections:
                     self.on_detections(detections)
 
             except Exception as e:
-                print(f"[YOLO] ❌ Error processing frame: {str(e)}")
+                logger.error(f"Error processing frame: {str(e)}")
 
             time.sleep(0.5)
 
     def start(self):
         if not self.running:
-            print("[YOLO] 🔄 Starting stream...")
+            logger.info("🔄 Starting YOLO stream...")
             self.running = True
             self.thread = threading.Thread(target=self._run)
             self.thread.start()
 
     def stop(self):
         if self.running:
-            print("[YOLO] 🛑 Stopping stream...")
+            logger.info("🛑 Stopping YOLO stream...")
             self.running = False
             self.cap.stop()
             if self.thread:
