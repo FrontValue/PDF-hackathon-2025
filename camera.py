@@ -50,7 +50,7 @@ class Camera:
 			else:
 				img = self.frames[-1]
 		else:
-			with open("images/not_found.jpeg","rb") as f:
+			with open("not-found.jpeg","rb") as f:
 				img = f.read()
 		return img
 		
