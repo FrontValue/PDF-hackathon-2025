@@ -2,3 +2,6 @@ venv/
 .DS_Store
 images/
 yolov5n.pt
+__pycache__/
+static/
+logs/
