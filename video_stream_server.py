@@ -7,7 +7,6 @@ from flask import Flask, Response
 
 import conf
 from camera import Camera
-from shared_camera import SharedCamera
 
 logging.config.dictConfig(conf.dictConfig)
 logger = logging.getLogger(__name__)

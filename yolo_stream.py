@@ -4,17 +4,20 @@ import threading
 import time
 from datetime import datetime
 
+from camera import Camera
+
 class YoloStreamer:
-    def __init__(self, on_detections=None, cam_index=0):
+    def __init__(self, on_detections=None):
         self.model = torch.hub.load('yolov5', 'yolov5n', source='local')
-        self.cap = cv2.VideoCapture(cam_index)
+        self.cap = Camera(fps=10)
+
         self.on_detections = on_detections  
         self.running = False
         self.thread = None
 
     def _run(self):
         while self.running:
-            ret, frame = self.cap.read()
+            ret, frame = self.cap.get_frame()
             if not ret:
                 print("[YOLO] ❌ Failed to read frame.")
                 continue
@@ -35,7 +38,7 @@ class YoloStreamer:
 
             time.sleep(0.5)
 
-        self.cap.release()
+        self.cap.stop()
 
     def start(self):
         if not self.running:
@@ -48,5 +51,5 @@ class YoloStreamer:
         if self.running:
             print("[YOLO] 🛑 Stopping stream...")
             self.running = False
-            self.thread.join()
+            # self.thread.join()
 
