@@ -25,6 +25,13 @@ def add_header(r):
 	r.headers["Cache-Control"] = "public, max-age=0"
 	return r
 
+def gen(camera):
+	logger.debug("Starting stream")
+	while True:
+		frame = camera.get_frame()
+		yield (b'--frame\r\n'
+			   b'Content-Type: image/png\r\n\r\n' + frame + b'\r\n')
+
 @app.route("/")
 def entrypoint():
     return Response(gen(camera),
