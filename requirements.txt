@@ -2,11 +2,7 @@ torch
 torchvision
 numpy
 opencv-python
-
 pandas
 requests
-requests
-
 Flask
 websockets
-socket

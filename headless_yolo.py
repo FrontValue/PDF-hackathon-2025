@@ -6,7 +6,6 @@ import datetime
 model = torch.hub.load('yolov5', 'yolov5n', source='local')
 model.eval()
 
-# Open the webcam
 cap = cv2.VideoCapture(0)
 if not cap.isOpened():
     raise RuntimeError("❌ Could not open webcam")

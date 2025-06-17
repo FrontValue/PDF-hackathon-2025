@@ -5,10 +5,10 @@ import time
 from datetime import datetime
 
 class YoloStreamer:
-    def __init__(self, socketio=None, cam_index=0):
+    def __init__(self, on_detections=None, cam_index=0):
         self.model = torch.hub.load('yolov5', 'yolov5n', source='local')
         self.cap = cv2.VideoCapture(cam_index)
-        self.socketio = socketio  # Optional
+        self.on_detections = on_detections  
         self.running = False
         self.thread = None
 
@@ -29,8 +29,9 @@ class YoloStreamer:
             else:
                 print(f"[{timestamp}] No detections.")
 
-            if self.socketio:
-                self.socketio.emit('yolo_data', {'detections': detections})
+            # 🔁 Send results to callback if defined
+            if self.on_detections:
+                self.on_detections(detections)
 
             time.sleep(0.5)
 
@@ -48,13 +49,4 @@ class YoloStreamer:
             print("[YOLO] 🛑 Stopping stream...")
             self.running = False
             self.thread.join()
-
-if __name__ == "__main__":
-    streamer = YoloStreamer()
-    try:
-        streamer.start()
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        streamer.stop()
 
