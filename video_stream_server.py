@@ -1,6 +1,7 @@
 import argparse
 import logging
 import logging.config
+import threading
 
 from flask import Flask, Response
 
@@ -9,9 +10,6 @@ from camera import Camera
 
 logging.config.dictConfig(conf.dictConfig)
 logger = logging.getLogger(__name__)
-
-camera = Camera()
-camera.run()
 
 app = Flask(__name__)
 
@@ -32,11 +30,19 @@ def entrypoint():
     return Response(gen(camera),
         mimetype="multipart/x-mixed-replace; boundary=frame")
 
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-p', '--port', type=int, default=5000, help="Running port")
+    parser.add_argument('-f', '--fps', type=int, default=20, help="Frames per second")
+    parser.add_argument('-H', '--host', type=str, default='0.0.0.0', help="Address to broadcast")
+    args = parser.parse_args()
 
-if __name__=="__main__":
-	parser = argparse.ArgumentParser()
-	parser.add_argument('-p','--port',type=int,default=5000, help="Running port")
-	parser.add_argument("-H","--host",type=str,default='0.0.0.0', help="Address to broadcast")
-	args = parser.parse_args()
-	logger.debug("Starting server")
-	app.run(host=args.host,port=args.port)
+    logger.debug("Starting server")
+
+    # Run camera in background if it's blocking
+    camera = Camera(fps=args.fps)
+
+    camera_thread = threading.Thread(target=camera.run)
+    camera_thread.start()
+
+    app.run(host=args.host, port=args.port)
