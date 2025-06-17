@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🚀 Starting Flask web server (app.py) on port 5000..."
+echo "🚀 Starting Flask web server (app.py) on port 5001..."
 python3 app.py > logs/flask.log 2>&1 &
 
 echo "📸 Starting video stream server (video_stream_server.py) on port 3002..."
