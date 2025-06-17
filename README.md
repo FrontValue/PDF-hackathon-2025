@@ -10,12 +10,25 @@ brew install python
 
 By installing Python, you will also get `pip3`, which is the package manager for Python.
 
-## Installation§
+## Installation
 
 ```bash
 git clone https://github.com/yourusername/PDF-hackathon-2025.git
 cd PDF-hackathon-2025
 pip3 install -r requirements.txt
+```
+
+## Deploying changes and running the project
+
+```bash
+ssh frontvalue3@frontvalue3.fritz.box # connect to raspberry pi
+hackathon # type password when asked
+
+cd PDF-hackathon-2025 # open folder
+git pull # pull changes from git repo
+source venv/bin/activate # virtual environments
+pip3 install -r requirements.txt # install packages if new once were added, if not - skip this part
+python3 start.sh # start servers
 ```
 
 ## Start the project
