@@ -1,9 +1,10 @@
-import cv2
-import threading
-import time
 import logging
 import os
+import threading
+import time
 from logging.handlers import RotatingFileHandler
+
+import cv2
 import numpy as np
 
 # Create logs directory if it doesn't exist
@@ -20,19 +21,35 @@ file_handler.setFormatter(logging.Formatter(
 file_handler.setLevel(logging.INFO)
 logger.addHandler(file_handler)
 
-thread = None
-
 class Camera:
-	def __init__(self,fps=20,video_source=0):
-		logger.info(f"Initializing camera class with {fps} fps and video_source={video_source}")
-		self.fps = fps
-		self.video_source = video_source
-		self.camera = None
-		self.initialize_camera()
-		# We want a max of 5s history to be stored, thats 5s*fps
-		self.max_frames = 5*self.fps
-		self.frames = []
-		self.isrunning = False
+	_instance = None
+	_lock = threading.Lock()
+
+	def __new__(cls, *args, **kwargs):
+		with cls._lock:
+			if cls._instance is None:
+				cls._instance = super(Camera, cls).__new__(cls)
+				cls._instance._initialized = False
+			return cls._instance
+
+	def __init__(self, fps=20, video_source=0):
+		if self._initialized:
+			return
+			
+		with self._lock:
+			if self._initialized:
+				return
+				
+			logger.info(f"Initializing camera class with {fps} fps and video_source={video_source}")
+			self.fps = fps
+			self.video_source = video_source
+			self.camera = None
+			self.initialize_camera()
+			# We want a max of 5s history to be stored, thats 5s*fps
+			self.max_frames = 5*self.fps
+			self.frames = []
+			self.isrunning = False
+			self._initialized = True
 
 	def initialize_camera(self):
 		try:
@@ -58,12 +75,10 @@ class Camera:
 			return
 
 		logging.debug("Preparing thread")
-		global thread
-		if thread is None:
+		if not self.isrunning:
 			logging.debug("Creating thread")
-			thread = threading.Thread(target=self._capture_loop,daemon=True)
-			logger.debug("Starting thread")
 			self.isrunning = True
+			thread = threading.Thread(target=self._capture_loop, daemon=True)
 			thread.start()
 			logger.info("Thread started")
 

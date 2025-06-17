@@ -49,7 +49,8 @@ class YoloStreamer:
 
                 # 🔁 Send results to callback if defined
                 if self.on_detections:
-                    self.on_detections(detections)
+                    frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                    self.on_detections(detections, frame_bgr)
 
             except Exception as e:
                 logger.error(f"Error processing frame: {str(e)}")

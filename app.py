@@ -1,9 +1,13 @@
-from flask import Flask
-from flask_socketio import SocketIO, send
-from yolo_stream import YoloStreamer
 import logging
 import os
 from logging.handlers import RotatingFileHandler
+import cv2
+
+from flask import Flask
+from flask_socketio import SocketIO, send
+
+from camera import Camera
+from yolo_stream import YoloStreamer
 
 # Create logs directory if it doesn't exist
 os.makedirs('logs', exist_ok=True)
@@ -33,17 +37,24 @@ def handle_message(msg):
     logger.info(f'Received message: {msg}')
     send(f'Echo: {msg}', broadcast=True)
 
-# :point_down: Callback to emit via WebSocket
-def emit_detections(detections):
+
+def emit_detections(detections, frame):
     logger.info(f"Emitting detections: {detections}")
-    socketio.emit("yolo_data", {"detections": detections})
+    socketio.emit("detections", {"detections": detections})
+    
+    # Convert frame to bytes if needed (e.g., for transmission)
+    # This example assumes JPEG encoding for streaming video frames
+    _, buffer = cv2.imencode('.jpg', frame)
+    frame_bytes = buffer.tobytes()
+    
+    socketio.emit("video", {"bytes": frame_bytes}) 
 
 # :spanner: Inject callback into streamer
 try:
     streamer = YoloStreamer(on_detections=emit_detections)
     streamer.start()
 except Exception as e:
-    logger.error(f"Failed to initialize YOLO streamer: {str(e)}")
+    logger.error(f"Failed to initialize streamer: {e}")
 
 if __name__ == '__main__':
     try:
