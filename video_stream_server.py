@@ -7,6 +7,7 @@ from flask import Flask, Response
 
 import conf
 from camera import Camera
+from shared_camera import SharedCamera
 
 logging.config.dictConfig(conf.dictConfig)
 logger = logging.getLogger(__name__)
@@ -26,11 +27,12 @@ def add_header(r):
 	return r
 
 def gen(camera):
-	logger.debug("Starting stream")
-	while True:
-		frame = camera.get_frame()
-		yield (b'--frame\r\n'
-			   b'Content-Type: image/png\r\n\r\n' + frame + b'\r\n')
+    logger.debug("Starting stream")
+    while True:
+        frame = camera.get_frame()
+        if frame is not None:
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/png\r\n\r\n' + frame + b'\r\n')
 
 @app.route("/")
 def entrypoint():
