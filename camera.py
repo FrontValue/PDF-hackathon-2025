@@ -2,8 +2,22 @@ import cv2
 import threading
 import time
 import logging
+import os
+from logging.handlers import RotatingFileHandler
 
+# Create logs directory if it doesn't exist
+os.makedirs('logs', exist_ok=True)
+
+# Configure logging
 logger = logging.getLogger(__name__)
+
+# Add file handler for camera.py
+file_handler = RotatingFileHandler('logs/camera.log', maxBytes=1024 * 1024, backupCount=10)
+file_handler.setFormatter(logging.Formatter(
+    '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+))
+file_handler.setLevel(logging.INFO)
+logger.addHandler(file_handler)
 
 thread = None
 
