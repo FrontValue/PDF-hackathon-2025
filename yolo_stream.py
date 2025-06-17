@@ -17,7 +17,7 @@ class YoloStreamer:
 
     def _run(self):
         while self.running:
-            frame = self.cap.get_frame()
+            frame = self.cap.get_frame(_bytes=False)
             if not frame:
                 print("[YOLO] ❌ Failed to read frame.")
                 continue
