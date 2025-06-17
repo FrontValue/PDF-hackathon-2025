@@ -6,3 +6,6 @@ pandas
 requests
 Flask
 websockets
+flask-socketio
+datetime
+seaborn
