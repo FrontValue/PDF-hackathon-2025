@@ -22,33 +22,33 @@ green2 = LED(6)
 def update_leds(distance):
     # Turn all off first
     for led in [green1, green2, yellow1, yellow2, red1, red2]:
-        led.off()
+        led.on()
 
     if distance < 5:
-        red1.on()
-        red2.on()
+        red1.off()
+        red2.off()
     elif distance < 15:
-        red1.on()
-        red2.on()
-        yellow1.on()
+        red1.off()
+        red2.off()
+        yellow1.off()
     elif distance < 25:
-        red1.on()
-        red2.on()
-        yellow1.on()
-        yellow2.on()
+        red1.off()
+        red2.off()
+        yellow1.off()
+        yellow2.off()
     elif distance < 35:
-        red1.on()
-        red2.on()
-        yellow1.on()
-        yellow2.on()
-        green1.on()
+        red1.off()
+        red2.off()
+        yellow1.off()
+        yellow2.off()
+        green1.off()
     elif distance < 50:
-        red1.on()
-        red2.on()
-        yellow1.on()
-        yellow2.on()
-        green1.on()
-        green2.on()
+        red1.off()
+        red2.off()
+        yellow1.off()
+        yellow2.off()
+        green1.off()
+        green2.off()
 
 def calculate_beep_interval(distance_cm):
     """
