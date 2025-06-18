@@ -1,4 +1,4 @@
-from gpiozero import DistanceSensor, PWMOutputDevice
+from gpiozero import DistanceSensor, PWMOutputDevice, LED
 from time import sleep
 
 # Set up distance sensor (trigger, echo)
@@ -6,6 +6,20 @@ sensor = DistanceSensor(echo=24, trigger=17, max_distance=2)
 
 # Set up buzzer (PWM pin)
 buzzer = PWMOutputDevice(27)  # GPIO18
+
+# red 2
+led = LED(22)
+# red 1
+led = LED(23)
+
+# yellow 2
+led = LED(25)
+# yellow 1
+led = LED(25)
+
+# green 2
+led = LED(26)
+led = LED(6)
 
 def calculate_beep_interval(distance_cm):
     """
@@ -27,8 +41,10 @@ try:
 
         if interval:
             buzzer.on()
+            led.on()
             sleep(0.05)
             buzzer.off()
+            led.off()
             sleep(interval)
         else:
             buzzer.off()
