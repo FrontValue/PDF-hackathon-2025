@@ -27,7 +27,7 @@ logger.addHandler(file_handler)
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-@app.route('/api/home')
+@app.route('/')
 def home():
     return 'Hello, world!'
 
