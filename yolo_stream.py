@@ -38,7 +38,7 @@ class YoloStreamer:
                 # Ensure frame is in the correct format (BGR to RGB)
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 results = self.model(frame)
-                df = results.pandas().xyxy[0][['name', 'confidence']]
+                df = results.pandas().xyxy[0][['name', 'confidence', 'xmin', 'ymin', 'xmax', 'ymax']]
                 detections = df.to_dict(orient='records')
 
                 timestamp = datetime.now().strftime('%H:%M:%S')
