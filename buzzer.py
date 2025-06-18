@@ -1,66 +1,48 @@
 from gpiozero import DistanceSensor, PWMOutputDevice, LED
 from time import sleep
 
-# Set up distance sensor (trigger, echo)
-sensor = DistanceSensor(echo=24, trigger=17, max_distance=2)
+# === CONFIGURABLE PARAMETERS ===
+MIN_DISTANCE_CM = 5      # Closest distance to trigger full response
+MAX_DISTANCE_CM = 50     # Beyond this distance, everything is off
 
-# Set up buzzer (PWM pin)
+# ===============================
+sensor = DistanceSensor(echo=24, trigger=17, max_distance=2)
 buzzer = PWMOutputDevice(27)  # GPIO18
 
-# Red
+# LEDs
 red1 = LED(22)
 red2 = LED(23)
-
-# Yellow
 yellow1 = LED(25)
 yellow2 = LED(16)
-
-# Green
 green1 = LED(26)
 green2 = LED(6)
 
-def update_leds(distance):
-    # Turn all off first
-    for led in [green1, green2, yellow1, yellow2, red1, red2]:
-        led.on()
+leds = [green2, green1, yellow2, yellow1, red2, red1]  # Order: far → close
 
-    if distance < 5:
-        red1.off()
-        red2.off()
-    elif distance < 15:
-        red1.off()
-        red2.off()
-        yellow1.off()
-    elif distance < 25:
-        red1.off()
-        red2.off()
-        yellow1.off()
-        yellow2.off()
-    elif distance < 35:
-        red1.off()
-        red2.off()
-        yellow1.off()
-        yellow2.off()
-        green1.off()
-    elif distance < 50:
-        red1.off()
-        red2.off()
-        yellow1.off()
-        yellow2.off()
-        green1.off()
-        green2.off()
+def update_leds(distance):
+    for led in leds:
+        led.off()
+
+    if distance > MAX_DISTANCE_CM:
+        return
+
+    # Divide distance range into 6 steps (one for each LED)
+    step = (MAX_DISTANCE_CM - MIN_DISTANCE_CM) / len(leds)
+
+    # Determine how many LEDs to light
+    leds_to_light = int((MAX_DISTANCE_CM - distance) / step)
+
+    for i in range(min(leds_to_light, len(leds))):
+        leds[i].on()
 
 def calculate_beep_interval(distance_cm):
-    """
-    Maps distance (5-50cm) to beep interval (fast near, slow far)
-    """
-    if distance_cm > 50:
-        return None  # Too far — no beep
-    elif distance_cm < 5:
-        distance_cm = 5
+    if distance_cm > MAX_DISTANCE_CM:
+        return None
+    elif distance_cm < MIN_DISTANCE_CM:
+        distance_cm = MIN_DISTANCE_CM
 
-    # Map distance 5–50 cm → interval 0.05s – 0.5s
-    interval = (distance_cm - 5) / (50 - 5) * (0.5 - 0.05) + 0.05
+    interval = ((distance_cm - MIN_DISTANCE_CM) /
+                (MAX_DISTANCE_CM - MIN_DISTANCE_CM)) * (0.5 - 0.05) + 0.05
     return interval
 
 try:
@@ -69,7 +51,6 @@ try:
         update_leds(dist_cm)
 
         interval = calculate_beep_interval(dist_cm)
-
         if interval:
             buzzer.on()
             sleep(0.05)
@@ -81,7 +62,7 @@ try:
 
 except KeyboardInterrupt:
     buzzer.off()
-    for led in [green1, green2, yellow1, yellow2, red1, red2]:
+    for led in leds:
         led.off()
     print("\nStopped")
 
