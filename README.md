@@ -28,9 +28,8 @@ cd PDF-hackathon-2025 # open folder
 git pull # pull changes from git repo
 source venv/bin/activate # virtual environments
 pip3 install -r requirements.txt # install packages if new once were added, if not - skip this part
-./start.sh # starting the project
-
-# run ./stop.sh to stop the project 
+python3 app.py # start to project
+# to stop run: pkill -f app.py
 ```
 
 ## Start the project
