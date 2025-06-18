@@ -7,19 +7,48 @@ sensor = DistanceSensor(echo=24, trigger=17, max_distance=2)
 # Set up buzzer (PWM pin)
 buzzer = PWMOutputDevice(27)  # GPIO18
 
-# red 2
-led = LED(22)
-# red 1
-led = LED(23)
+# Red
+red1 = LED(22)
+red2 = LED(23)
 
-# yellow 2
-led = LED(25)
-# yellow 1
-led = LED(25)
+# Yellow
+yellow1 = LED(25)
+yellow2 = LED(16)
 
-# green 2
-led = LED(26)
-led = LED(6)
+# Green
+green1 = LED(26)
+green2 = LED(6)
+
+def update_leds(distance):
+    # Turn all off first
+    for led in [green1, green2, yellow1, yellow2, red1, red2]:
+        led.off()
+
+    if distance < 5:
+        red1.on()
+        red2.on()
+    elif distance < 15:
+        red1.on()
+        red2.on()
+        yellow1.on()
+    elif distance < 25:
+        red1.on()
+        red2.on()
+        yellow1.on()
+        yellow2.on()
+    elif distance < 35:
+        red1.on()
+        red2.on()
+        yellow1.on()
+        yellow2.on()
+        green1.on()
+    elif distance < 50:
+        red1.on()
+        red2.on()
+        yellow1.on()
+        yellow2.on()
+        green1.on()
+        green2.on()
 
 def calculate_beep_interval(distance_cm):
     """
@@ -37,14 +66,14 @@ def calculate_beep_interval(distance_cm):
 try:
     while True:
         dist_cm = sensor.distance * 100
+        update_leds(dist_cm)
+
         interval = calculate_beep_interval(dist_cm)
 
         if interval:
             buzzer.on()
-            led.on()
             sleep(0.05)
             buzzer.off()
-            led.off()
             sleep(interval)
         else:
             buzzer.off()
@@ -52,5 +81,7 @@ try:
 
 except KeyboardInterrupt:
     buzzer.off()
+    for led in [green1, green2, yellow1, yellow2, red1, red2]:
+        led.off()
     print("\nStopped")
 
